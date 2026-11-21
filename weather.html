@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Information</title>
+</head>
+<body>
+
+    <h1>Weather Information</h1>
+    <br>
+    <hr>
+
+    <input type="text" id="city" placeholder="Enter city name">
+    <br><br>
+
+    <button onclick="getData()">Get Data</button>
+
+    <div id="result"></div>
+
+    <script>
+
+        function getData() {
+
+            let place = document.getElementById("city").value;
+
+            fetch("https://geocoding-api.open-meteo.com/v1/search?name=" + place + "&count=1")
+
+            .then(response => response.json())
+
+            .then(location => {
+
+                if (!location.results) {
+                    document.getElementById("result").innerHTML = "City not found";
+                    return;
+                }
+
+                let lat = location.results[0].latitude;
+                let lon = location.results[0].longitude;
+
+                fetch("https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon + "&current=temperature_2m,relative_humidity_2m,wind_speed_10m")
+                .then(response => response.json())
+
+                .then(data => {
+
+                    console.log(data);
+
+                    document.getElementById("result").innerHTML =
+                    "<h2>Weather Details</h2>" +
+                    "<p>City: " + place + "</p>" +
+                    "<p>Temperature: " + data.current.temperature_2m + " °C</p>" +
+                    "<p>Humidity: " + data.current.relative_humidity_2m + " %</p>" +
+                    "<p>Wind Speed: " + data.current.wind_speed_10m + " km/h</p>";
+
+                });
+
+            })
+
+            .catch(error => console.log(error));
+
+        }
+
+    </script>
+
+</body>
+</html>
